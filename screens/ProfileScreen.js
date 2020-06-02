@@ -9,6 +9,7 @@ const ProfileScreen = () => {
   return (
     <View style={styles.container}>
       <Text>Profile Screen</Text>
+      <Text>Email Data</Text>
       <Button title='Sign out' onPress={signOut} />
     </View>
   );
