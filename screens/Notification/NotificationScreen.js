@@ -1,21 +1,16 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 
-import { AuthContext } from '../components/context';
-
-const ProfileScreen = () => {
-  const { signOut } = React.useContext(AuthContext);
-
+const NotificationScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <Text>Profile Screen</Text>
-      <Text>Email Data</Text>
-      <Button title='Sign out' onPress={signOut} />
+      <Text>Notification Screen</Text>
+      <Button title='Details' onPress={() => navigation.navigate('Details')} />
     </View>
   );
 };
 
-export default ProfileScreen;
+export default NotificationScreen;
 
 const styles = StyleSheet.create({
   container: {

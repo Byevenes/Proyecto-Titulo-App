@@ -1,16 +1,18 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 
-const NotificationScreen = () => {
+import useFetch from '../../hooks/useFetch';
+
+const CrearPuntoProfileScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
-      <Text>Notification Screen</Text>
+      <Text>Crear Punto Profile Screen</Text>
       <Button title='Click Here' onPress={() => alert('Button Clicked!')} />
     </View>
   );
 };
 
-export default NotificationScreen;
+export default CrearPuntoProfileScreen;
 
 const styles = StyleSheet.create({
   container: {

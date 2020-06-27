@@ -1,9 +1,11 @@
 import React from 'react';
 import {
   View,
+  Text,
   TextInput,
   Button,
   StyleSheet,
+  Image,
   TouchableOpacity,
 } from 'react-native';
 
@@ -16,37 +18,35 @@ const SignInScreen = ({ navigation }) => {
   const { signIn } = React.useContext(AuthContext);
 
   return (
-    <View>
-      <TextInput placeholder='Email' value={email} onChangeText={setEmail} />
+    <View style={styles.container}>
+      <Text style={styles.titulo}>Recorrido San Pedro</Text>
+      <Image
+        style={styles.logo}
+        source={require('../../assets/logotipo.png')}
+      />
       <TextInput
+        style={styles.textInput}
+        placeholder='Email'
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput
+        style={styles.textInput}
         placeholder='Password'
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title='Sign in' onPress={() => signIn({ email, password })} />
       <TouchableOpacity
-        onPress={() => navigation.navigate('SignUpScreen')}
-        style={[
-          styles.signIn,
-          {
-            borderColor: '#009387',
-            borderWidth: 1,
-            marginTop: 15,
-          },
-        ]}
+        onPress={() => signIn({ email, password })}
+        style={[styles.signIn]}
       >
-        <Text
-          style={[
-            styles.textSign,
-            {
-              color: '#009387',
-            },
-          ]}
-        >
-          Sign Up
-        </Text>
+        <Text style={[styles.textSign]}>Iniciar Sesión</Text>
       </TouchableOpacity>
+      <Button
+        title='Registrarse'
+        onPress={() => navigation.navigate('SignUpScreen')}
+      />
     </View>
   );
 };
@@ -58,16 +58,41 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#D5D3FB',
   },
   signIn: {
-    width: '100%',
+    width: '50%',
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 10,
+    borderRadius: 30,
+    backgroundColor: '#5D4CF7',
+    borderWidth: 1,
+    marginTop: 20,
+    marginBottom: 20,
   },
   textSign: {
     fontSize: 18,
-    fontWeight: 'bold',
+    color: 'white',
+  },
+  logo: {
+    width: 200,
+    height: 200,
+    paddingBottom: 20,
+  },
+  titulo: {
+    fontSize: 30,
+    fontWeight: 'normal',
+    paddingBottom: 20,
+  },
+  textInput: {
+    width: '65%',
+    height: 50,
+    borderRadius: 30,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    marginTop: 15,
+    fontSize: 15,
+    textAlign: 'center',
   },
 });

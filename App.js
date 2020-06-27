@@ -1,20 +1,67 @@
+/**Importanciones necesarias para la creación de la app
+ *
+ * AsyncStorage = Para el uso de almacenamiento seguro del token
+ *
+ * NavigationContainer = Navigation 5 de react native cambio las Importanciones
+ *
+ * createStackNavigator = Navigation 5 del tipo Stack para poder separa los componenetes de la APP
+ *
+ * BASE_URL = Archivo que importamos de la carpeta config que retorna la URl de la API para las consultas de login.
+ *
+ * AuthContext = Componente que exporta una variable la cual creamos para hacer un Context, este es un hook de react
+ * el cual puede hacer cambios al padre estando en el hijo, esto se hizo a modo de administrar los estados
+ * de igual manera se pudo utilizar 'redux' para este caso, pero preferi utilizar los hooks de react para la
+ * 'Authentication flows'.
+ *
+ * RootStackScreen = Es una de nuestras screens que almacena 2 screen del tipo StackNavigator en la cual tenemos
+ * la screen de SingInScreen(Login) y SingUpScreen(Register).
+ *
+ *MainTabScreen = Es otra screen la cual almacena 4 screen del tipo TabNavigator en la cual tenemos la screen de
+ *NotificationScreen(Notificaciones) la cual es la primera en mostrarse por pantalla, RecorridoScreen(Recorridos),
+ *MapaScreen(Mapa) y ProfileScreen(Perfil).
+ *
+ *SplashScreen = Es una Screen en la cual se encuentra dentro de la carpeta de 'auth' de igual manera que login
+ *y registerla cual nos entrega un simple loading... para poder las transiciones de estado si estoy validado o no.
+ */
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import AsyncStorage from '@react-native-community/async-storage';
+import { BASE_URL } from './config';
 
 import { AuthContext } from './components/context';
 
 import RootStackScreen from './screens/RootStackScreen';
-
-import SignInScreen from './screens/auth/SignInScreen';
+import MainTabScreen from './screens/MainTabScreen';
 import SplashScreen from './screens/auth/SplashScreen';
 
-import MainTabScreen from './screens/MainTabScreen';
-
+// creamos una constante que almacenara un StackNavigator, para su uso posterior en el return de la APP
 const Stack = createStackNavigator();
 
+/**
+ * Hacemos uso de 'useReducer' para la continuación de la 'Authentication flows' este hook es una alternativa a
+ * useState. Esta acepta un reducer del tipo ostrado (state, action) => y devuelve el estado actual con el método dispatch.
+ *
+ * En este Reducer tendremos '4 casos'
+ *
+ * 'RESTORE_TOKEN : retornara una copia del stado, el token y el estado en false del Loading.
+ * (caso parala acción de poder saber si ya tenemos token luego de cerrar la app y habernos logueado para no tener que loguearse otra vez)
+ *
+ * 'SIGN_IN': retornara una copia del estado , el token y el estado en false pero del 'Signout'.
+ * (caso para la acción de poder loguearnos en la APP)
+ *
+ * 'SIGN_OUT': retorna una copia del estado, el token sera null y el estado de 'Signout' sera true.
+ * (caso para la acción de poder salir de la APP)
+ *
+ * 'Default': retorna 3 estados, uno 'Loading' en true, 'Signout' en false y el 'Token' sera null.
+ * (caso para la acción por default de la APP)
+ *
+ * isLoading- Configuramos esto 'true' cuando intentamos verificar si ya tenemos un token guardado en 'AsyncStorage'.
+ * isSignout- Lo configuramos 'true' cuando el usuario está cerrando sesión.
+ * userToken- El token para el usuario. Si no es nulo, asumimos que el usuario ha iniciado sesión, de lo contrario no.
+ *
+ */
 export default function App({ navigation }) {
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
@@ -46,71 +93,102 @@ export default function App({ navigation }) {
     }
   );
 
+  // Hacemos uso del hook de React 'useEffect' el cual se ejecutara la función 'TokenRefresAsync' 1 sola vez.
   React.useEffect(() => {
-    // Fetch the token from storage then navigate to our appropriate place
-    const bootstrapAsync = async () => {
+    // Obtenemos el token del AsyncStorage y luego navegamos a nuestro lugar.
+    const TokenRefreshAsync = async () => {
       let userToken;
-
+      // Creamos una variable que almacene el token y luego podamos despachar la actión.
       try {
         userToken = await AsyncStorage.getItem('userToken');
       } catch (e) {
-        // Restoring token failed
+        // Restorna si el token fallo
         console.log(e);
       }
-
-      // After restoring token, we may need to validate it in production apps
-
-      // This will switch to the App screen or Auth screen and this loading
-      // screen will be unmounted and thrown away.
+      /**
+       * Este 'dispatch' realizara la acción de 'RESTORE_TOKEN',
+       * esto cambiara a la pantalla de la APP estando dentro o
+       * a la pantalla de autenticación si no encuentra el token ,
+       * por ultimo la pantalla será desmontada y desechada de forma visual.
+       */
       dispatch({ type: 'RESTORE_TOKEN', token: userToken });
     };
-
-    bootstrapAsync();
+    // Llamamos a la función creada recién 'TokenRefresAsync' para que se ejecute.
+    TokenRefreshAsync();
   }, []);
 
   const authContext = React.useMemo(
     () => ({
-      signIn: async (data) => {
-        // In a production app, we need to send some data (usually username, password) to server and get a token
-        // We will also need to handle errors if sign in failed
-        // After getting token, we need to persist the token using `AsyncStorage`
-        // In the example, we'll use a dummy token
-
-        dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' });
+      signIn: async (email, password) => {
+        // la función 'signIn' necesitamos enviar la data (email, password) al servidor y recibir el token.
+        /**
+         * De igual manera necesitamos manejar los errores si falla el inicio de sesión.
+         * Despues de hacer la petición necesitamos obtener el token y conservarlo usando 'AsyncStorage'.
+         * De igual manera guardamos la 'userID' para poder hace uso en peticiones dentro de la APP.
+         *
+         * Y por ultimo hacemos el 'dispatch' de la acción 'SIGN_IN' y enviando el token guardo de manera persistente en Dispositivo.
+         */
+        fetch(`${BASE_URL}/api/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'Application/json',
+          },
+          body: JSON.stringify(email, password),
+        })
+          .then((x) => x.text())
+          .then((x) => {
+            try {
+              return JSON.parse(x);
+            } catch {
+              throw x;
+            }
+          })
+          .then((x) => {
+            if (x.ok === true) {
+              AsyncStorage.setItem('userID', x.usuario._id);
+              AsyncStorage.setItem('userToken', x.token);
+              return dispatch({ type: 'SIGN_IN', token: x.token });
+            }
+            return Alert.alert('Error', x.err.message);
+          });
       },
-      signOut: () => dispatch({ type: 'SIGN_OUT' }),
-      signUp: async (data) => {
-        // In a production app, we need to send user data to server and get a token
-        // We will also need to handle errors if sign up failed
-        // After getting token, we need to persist the token using `AsyncStorage`
-        // In the example, we'll use a dummy token
-
-        dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' });
+      signOut: async () => {
+        // Función 'signOut' la cual obtendra el token para su eliminación y posterior despacho de la acción.
+        let removeToken; // Creamos variable que almacenera el token para luego despachar la acción de removerlo.
+        try {
+          removeToken = await AsyncStorage.removeItem('userToken');
+        } catch (e) {
+          // Si llega haber un problema el catch entregara la información
+          console.log(e);
+        }
+        // Hacemos el 'dispatch' a la acción 'SIGN_OUT' y señalando el token removido.
+        dispatch({ type: 'SIGN_OUT', removeToken });
+        return await AsyncStorage.removeItem('userID');
       },
+      /*signUp: async (data) => { creo que es innecesario tener uno de registro, esto lo desarrollamos a mano.
+      },*/
     }),
     []
   );
-
+  /**
+   * Por ultimos nuestra APP retornara
+   * 1.- Un 'AuthContext' el cual es el contexto creado para la Authentication flows en donde el value es el componente creado.
+   * 2.- Nuestro 'StackNavigator' se encuentra envolvido dentro de nuestro 'NavigationContainer' como señala Navigation 5.
+   * 3.- Señalamos si la variable de 'isLoading' es true o false y depeniendo de esto vemos que Screen mostramos.
+   * 4.- Pasado esa condición preguntamos al state si el 'userToken' es 'null' y nuevamente dependiendo de la respuesta vemos que Screen mostramos.
+   */
   return (
     <AuthContext.Provider value={authContext}>
       <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
           {state.isLoading ? (
-            // We haven't finished checking for the token yet
+            // En este caso todavia no hemos terminado de buscar el 'token'
             <Stack.Screen name='Splash' component={SplashScreen} />
           ) : state.userToken == null ? (
-            // No token found, user isn't signed in
-            <Stack.Screen
-              name='SignIn'
-              component={SignInScreen}
-              options={{
-                title: 'Sign in',
-                // When logging out, a pop animation feels intuitive
-                animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-              }}
-            />
+            // No se encontró el token, el usuario no ha inisiado sesión
+            <Stack.Screen name='Auth' component={RootStackScreen} />
           ) : (
-            // User is signed in
+            // El usuario ha iniciado sesión
             <Stack.Screen name='App' component={MainTabScreen} />
           )}
         </Stack.Navigator>
@@ -118,19 +196,3 @@ export default function App({ navigation }) {
     </AuthContext.Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  map: {
-    flex: 1,
-    display: 'flex',
-  },
-  fondo: {
-    backgroundColor: '#009387',
-  },
-});
