@@ -8,22 +8,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     height: 60,
     justifyContent: 'center',
+    alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  card: {
-    flex: 1,
-    flexDirection: 'row',
-    margin: 5,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
   textName: {
-    fontSize: 18,
+    fontSize: 16,
     textAlign: 'center',
   },
   textFecha: {
-    fontSize: 15,
+    fontSize: 13,
     textAlign: 'center',
     color: '#626FB4',
   },
@@ -32,9 +26,9 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ({ name, fecha }) => {
+export default ({ name, fecha, onPress }) => {
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={onPress}>
       <Card.Title
         title={name}
         titleStyle={styles.textName}
@@ -49,6 +43,6 @@ export default ({ name, fecha }) => {
           />
         )}
       />
-    </View>
+    </TouchableOpacity>
   );
 };

@@ -3,6 +3,8 @@ import { View, Text, Button, StyleSheet, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
 import ListItemPuntoChofer from '../../components/Profile/PuntoChofer/ListItemPuntoChofer';
+import SplashScreen from '../auth/SplashScreen';
+
 import { BASE_URL } from '../../config';
 
 const PuntosChoferProfileScreen = ({ route, navigation }) => {
@@ -30,7 +32,7 @@ const PuntosChoferProfileScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       {puntoChoferCargado ? (
-        <Text>Cargando...</Text>
+        <SplashScreen />
       ) : (
         <FlatList
           style={styles.list}
@@ -55,8 +57,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   list: {
     alignSelf: 'stretch',

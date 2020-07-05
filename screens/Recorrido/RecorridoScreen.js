@@ -4,6 +4,8 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import ListItemRecorrido from '../../components/Recorrido/ListItemRecorrido';
+import SplashScreen from '../auth/SplashScreen';
+
 import { BASE_URL } from '../../config';
 
 const RecorridoScreen = ({ navigation }) => {
@@ -26,10 +28,11 @@ const RecorridoScreen = ({ navigation }) => {
     setRecorridosCargado(false);
   };
 
+
   return (
     <View style={styles.container}>
       {recorridosCargado ? (
-        <Text>Cargando...</Text>
+        <SplashScreen />
       ) : (
         <FlatList
           style={styles.list}
@@ -66,6 +69,7 @@ const RecorridoScreen = ({ navigation }) => {
                 navigation.navigate('Detalle', {
                   id: item._id,
                   name: item.name_recorrido,
+                  name_poblacion: item.poblacion.name_poblacion,
                   descripcion: item.descripcion_recorrido,
                   fecha_inicio: item.date_recorrido_iniciado,
                   fecha_finalizo: item.date_recorrido_finalizado,
@@ -90,8 +94,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#D5D3FB',
   },
   list: {

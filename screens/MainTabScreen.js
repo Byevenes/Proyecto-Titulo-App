@@ -10,8 +10,9 @@ import DetailsNotificationScreen from './Notification/DetailsNotificationScreen'
 
 import RecorridoScreen from './Recorrido/RecorridoScreen';
 import DetailsRecorridoScreen from './Recorrido/DetailsRecorridoScreen';
-import ComentarioDetailsRecorridoScreen from './Recorrido/ComentarioDetailsRecorridoScreen';
+import ComentariosRecorrido from './Recorrido/ComentariosRecorrido';
 import CrearComentarioScreen from './Recorrido/CrearComentarioScreen';
+import ComentariosDetailsRecorrido from './Recorrido/ComentariosDetailsRecorrido';
 
 import MapaScreen from './Mapa/MapaScreen';
 
@@ -65,11 +66,15 @@ const RecorridoStackScreen = ({ navigation }) => {
       />
       <RecorridoStack.Screen
         name='Comentarios'
-        component={ComentarioDetailsRecorridoScreen}
+        component={ComentariosRecorrido}
       />
       <RecorridoStack.Screen
         name='Crear Comentario'
         component={CrearComentarioScreen}
+      />
+      <RecorridoStack.Screen
+        name='ComentariosDetails'
+        component={ComentariosDetailsRecorrido}
       />
     </RecorridoStack.Navigator>
   );

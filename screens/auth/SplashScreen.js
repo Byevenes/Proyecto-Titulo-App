@@ -3,12 +3,10 @@ import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 
 const SplashScreen = () => {
   return (
-    <View style={styles.overlay}>
       <View style={styles.container}>
         <ActivityIndicator color={'black'} />
-        <Text style={styles.text}>Loading...</Text>
+        <Text style={styles.text}>Cargando...</Text>
       </View>
-    </View>
   );
 };
 
@@ -20,4 +18,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  text:{
+    textAlign: 'center',
+  }
 });

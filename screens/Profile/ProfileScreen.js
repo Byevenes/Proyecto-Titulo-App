@@ -1,12 +1,15 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Button, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { AuthContext } from '../../components/context';
 import { BASE_URL } from '../../config';
 
-const ProfileScreen = ({ navigation }) => {
+import SplashScreen from '../auth/SplashScreen';
+
+const ProfileScreen = ({route, navigation }) => {
+
   const { signOut } = React.useContext(AuthContext);
 
   const [usuario, setUsuario] = useState([]);
@@ -16,9 +19,40 @@ const ProfileScreen = ({ navigation }) => {
   const [comentarioCargado, setComentarioCargado] = useState(true);
 
   useEffect(() => {
+    if (route.params?.data) {
+      putUsuario()
+    }
     fetchUsuario();
     fetchComentario();
-  }, []);
+  }, [route.params?.data]);
+
+  const putUsuario = async () => {
+    const idUser = await AsyncStorage.getItem('userID');
+    AsyncStorage.getItem('userToken').then((x) => {
+      fetch(`${BASE_URL}/api/usuario/${idUser}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'Application/json',
+          token: x,
+        },
+        body: JSON.stringify(route.params.data),
+      })
+        .then((x) => x.text())
+        .then((x) => {
+          try {
+            return JSON.parse(x);
+          } catch {
+            throw x;
+          }
+        })
+        .then((x) => {
+          if (x.ok === true) {
+            return Alert.alert(`Usuario ${x.usuario.nombre} actualizado`);
+          }
+          return Alert.alert('Error en actualizar los datos');
+        });
+    });
+  }
 
   const fetchUsuario = async () => {
     const idUser = await AsyncStorage.getItem('userID');
@@ -49,7 +83,7 @@ const ProfileScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {usuarioCargado || comentarioCargado ? (
-        <Text>Cargando...</Text>
+        <SplashScreen />
       ) : (
         <Fragment>
           <View style={styles.profileImg}>

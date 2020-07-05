@@ -3,6 +3,8 @@ import { View, Text, Button, StyleSheet, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
 import ListItemComentario from '../../components/Profile/Comentario/ListItemComentario';
+import SplashScreen from '../auth/SplashScreen';
+
 import { BASE_URL } from '../../config';
 
 const ComentarioProfileScreen = ({ route, navigation }) => {
@@ -30,7 +32,7 @@ const ComentarioProfileScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       {comentarioCargado ? (
-        <Text>Cargando...</Text>
+        <SplashScreen />
       ) : (
         <FlatList
           style={styles.list}
@@ -54,8 +56,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   list: {
     alignSelf: 'stretch',

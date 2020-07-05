@@ -2,12 +2,12 @@ import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 
 const DetailsRecorridoScreen = ({ route, navigation }) => {
-  const { id, name, descripcion, fecha_inicio, fecha_finalizo } = route.params;
+  const { id, name, name_poblacion ,descripcion, fecha_inicio, fecha_finalizo } = route.params;
 
   return (
     <View style={styles.container}>
-      <Text>{id}</Text>
       <Text>{name}</Text>
+      <Text>{name_poblacion}</Text>
       <Text>{descripcion}</Text>
       <Text>{fecha_inicio}</Text>
       <Text>{fecha_finalizo}</Text>

@@ -4,9 +4,11 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import ListItemComentariosRecorrido from '../../components/Recorrido/ListItemComentariosRecorrido';
+import SplashScreen from '../auth/SplashScreen';
+
 import { BASE_URL } from '../../config';
 
-const ComentarioDetailsRecorridoScreen = ({ route, navigation }) => {
+const ComentariosRecorrido = ({ route, navigation }) => {
   const { id } = route.params;
 
   const [comentariosRecorrido, setComentariosRecorrido] = useState([]);
@@ -19,7 +21,7 @@ const ComentarioDetailsRecorridoScreen = ({ route, navigation }) => {
   const [usuarioCargado, setUsuarioCargado] = useState(true);
 
   useEffect(() => {
-    if (route.params?.data) {
+    if (route.params.data) {
       AsyncStorage.getItem('userToken').then((x) => {
         fetch(`${BASE_URL}/api/comentario`, {
           method: 'POST',
@@ -47,7 +49,7 @@ const ComentarioDetailsRecorridoScreen = ({ route, navigation }) => {
     }
     fetchComentariosRecorrido();
     fetchIdUser();
-  }, [route.params?.data]);
+  }, [route.params.data]);
 
   const fetchIdUser = async () => {
     const idUser = await AsyncStorage.getItem('userID');
@@ -73,7 +75,7 @@ const ComentarioDetailsRecorridoScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       {comentariosRecorridoCargado || usuarioCargado ? (
-        <Text>Cargando...</Text>
+        <SplashScreen />
       ) : (
         <Fragment>
           <FlatList
@@ -85,6 +87,9 @@ const ComentarioDetailsRecorridoScreen = ({ route, navigation }) => {
                 name={item.description_comentario}
                 name_user={item.creator.nombre}
                 fecha={item.date_comentario}
+                onPress={() => navigation.navigate('ComentariosDetails', {
+                  idComentario: item._id,
+                })}
               />
             )}
           />
@@ -107,7 +112,7 @@ const ComentarioDetailsRecorridoScreen = ({ route, navigation }) => {
   );
 };
 
-export default ComentarioDetailsRecorridoScreen;
+export default ComentariosRecorrido;
 
 const styles = StyleSheet.create({
   container: {

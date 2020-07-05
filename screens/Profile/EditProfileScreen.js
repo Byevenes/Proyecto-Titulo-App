@@ -12,14 +12,18 @@ import useForm from '../../hooks/useForm';
 
 import { BASE_URL } from '../../config';
 
+import SplashScreen from '../auth/SplashScreen';
+
 const EditProfileScreen = ({ route, navigation }) => {
   const { id, nombre } = route.params;
 
   const initialState = {
     nombre: nombre,
+    id: id,
   };
 
   const onSubmit = (data) => {
+    /*
     AsyncStorage.getItem('userToken').then((x) => {
       fetch(`${BASE_URL}/api/usuario/${id}`, {
         method: 'PUT',
@@ -44,7 +48,8 @@ const EditProfileScreen = ({ route, navigation }) => {
           }
           return Alert.alert('Error en actualizar los datos');
         });
-    });
+    });*/
+    navigation.navigate('Perfil', { data: data });
   };
 
   const [usuario, setUsuario] = useState([]);
@@ -71,7 +76,7 @@ const EditProfileScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       {usuarioCargado ? (
-        <Text>Cargando...</Text>
+        <SplashScreen />
       ) : (
         <Fragment>
           <View style={styles.editData}>

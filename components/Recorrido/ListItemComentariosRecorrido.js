@@ -1,52 +1,49 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Card } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: '100%',
-    justifyContent: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  card: {
-    flex: 1,
-    flexDirection: 'row',
-    margin: 5,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
   textName: {
-    fontSize: 18,
+    fontSize: 16,
     textAlign: 'center',
-    paddingTop: 5,
+    flex: 1,
   },
   textFecha: {
-    fontSize: 15,
-    textAlign: 'center',
+    fontSize: 13,
     color: '#626FB4',
+    textAlign: 'center',
     flex: 1,
   },
   textIcon: {
     color: '#5D4CF7',
   },
+  Icon:{
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   textLeft: {
-    flex: 1,
+    flex: 0.3,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
   },
 });
 
-export default ({ name, name_user, fecha }) => {
+export default ({ name, name_user, fecha, onPress }) => {
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={onPress}>
       <Card.Title
         title={name}
         titleStyle={styles.textName}
         subtitle={fecha}
         subtitleStyle={styles.textFecha}
         left={(props) => (
-          <View style={styles.textLeft}>
+          <View style={styles.Icon}>
             <MaterialCommunityIcons
               {...props}
               name='account-circle'
@@ -56,7 +53,8 @@ export default ({ name, name_user, fecha }) => {
             <Text style={styles.textIcon}>{name_user}</Text>
           </View>
         )}
+        leftStyle={styles.textLeft}
       />
-    </View>
+    </TouchableOpacity>
   );
 };
