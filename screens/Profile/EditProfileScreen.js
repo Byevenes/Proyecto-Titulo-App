@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment } from 'react';
+import React, { useEffect, useState, Fragment } from "react";
 import {
   View,
   Text,
@@ -6,13 +6,16 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-} from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
-import useForm from '../../hooks/useForm';
+} from "react-native";
+import { Formik } from "formik";
+import * as Yup from "yup";
 
-import { BASE_URL } from '../../config';
+import AsyncStorage from "@react-native-community/async-storage";
+import useForm from "../../hooks/useForm";
 
-import SplashScreen from '../auth/SplashScreen';
+import { BASE_URL } from "../../config";
+
+import SplashScreen from "../auth/SplashScreen";
 
 const EditProfileScreen = ({ route, navigation }) => {
   const { id, nombre } = route.params;
@@ -49,7 +52,7 @@ const EditProfileScreen = ({ route, navigation }) => {
           return Alert.alert('Error en actualizar los datos');
         });
     });*/
-    navigation.navigate('Perfil', { data: data });
+    navigation.navigate("Perfil", { data: data });
   };
 
   const [usuario, setUsuario] = useState([]);
@@ -60,7 +63,7 @@ const EditProfileScreen = ({ route, navigation }) => {
   }, []);
 
   const fetchUsuario = async () => {
-    const Token = await AsyncStorage.getItem('userToken');
+    const Token = await AsyncStorage.getItem("userToken");
     const response = await fetch(`${BASE_URL}/api/usuario/${id}`, {
       headers: {
         token: Token,
@@ -71,35 +74,66 @@ const EditProfileScreen = ({ route, navigation }) => {
     setUsuarioCargado(false);
   };
 
-  const { subscribe, inputs, handleSubmit } = useForm(initialState, onSubmit);
+  const validationSchema = Yup.object().shape({
+    nombre: Yup.string()
+      .min(2, "Nombre muy corto")
+      .max(12, "Nombre muy largo")
+      .required("El nombre es necesario"),
+  });
+
+  //const { subscribe, inputs, handleSubmit } = useForm(initialState, onSubmit);
 
   return (
     <View style={styles.container}>
       {usuarioCargado ? (
         <SplashScreen />
       ) : (
-        <Fragment>
-          <View style={styles.editData}>
-            <Text style={styles.text}>Nombre</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder={usuario.nombre}
-              value={inputs.nombre}
-              onChangeText={subscribe('nombre')}
-            />
-          </View>
-          <View style={styles.profileSignOut}>
-            <TouchableOpacity onPress={handleSubmit} style={[styles.signOut]}>
-              <Text style={[styles.textSignOut]}>Guardar Cambios</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={[styles.signOut]}
-            >
-              <Text style={[styles.textSignOut]}>Cancelar</Text>
-            </TouchableOpacity>
-          </View>
-        </Fragment>
+        <Formik
+          initialValues={initialState}
+          onSubmit={onSubmit}
+          validationSchema={validationSchema}
+        >
+          {({
+            values,
+            handleChange,
+            errors,
+            setFieldTouched,
+            touched,
+            isValid,
+            handleSubmit,
+          }) => (
+            <Fragment>
+              <View style={styles.editData}>
+                <Text style={styles.text}>Nombre</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder={usuario.nombre}
+                  value={values.nombre}
+                  onChangeText={handleChange("nombre")}
+                  onBlur={() => setFieldTouched("nombre")}
+                />
+                {touched.nombre && errors.nombre && (
+                  <Text style={styles.formikError}>{errors.nombre}</Text>
+                )}
+              </View>
+              <View style={styles.profileSignOut}>
+                <TouchableOpacity
+                  onPress={handleSubmit}
+                  style={[styles.signOut]}
+                  disabled={!isValid}
+                >
+                  <Text style={[styles.textSignOut]}>Guardar Cambios</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => navigation.goBack()}
+                  style={[styles.signOut]}
+                >
+                  <Text style={[styles.textSignOut]}>Cancelar</Text>
+                </TouchableOpacity>
+              </View>
+            </Fragment>
+          )}
+        </Formik>
       )}
     </View>
   );
@@ -110,8 +144,8 @@ export default EditProfileScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingTop: 20,
   },
   editData: {
@@ -120,17 +154,17 @@ const styles = StyleSheet.create({
   },
   text: {
     paddingTop: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   textInput: {
     width: 250,
     height: 50,
     borderRadius: 30,
-    backgroundColor: '#ffff',
+    backgroundColor: "#ffff",
     borderWidth: 1,
     marginTop: 15,
     fontSize: 15,
-    textAlign: 'center',
+    textAlign: "center",
   },
   profileSignOut: {
     flex: 3,
@@ -138,10 +172,10 @@ const styles = StyleSheet.create({
   signOut: {
     width: 250,
     height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 30,
-    backgroundColor: '#5D4CF7',
+    backgroundColor: "#5D4CF7",
     borderWidth: 1,
     marginTop: 20,
     marginBottom: 20,
@@ -149,6 +183,12 @@ const styles = StyleSheet.create({
   },
   textSignOut: {
     fontSize: 13,
-    color: 'white',
+    color: "white",
+  },
+  formikError: {
+    fontSize: 13,
+    color: "red",
+    textAlign: "center",
+    paddingTop: 20,
   },
 });

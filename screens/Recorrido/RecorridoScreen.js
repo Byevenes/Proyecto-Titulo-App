@@ -1,12 +1,12 @@
-import React, { useState, useEffect, Fragment } from 'react';
-import { View, Text, Button, StyleSheet, FlatList } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useState, useEffect, Fragment } from "react";
+import { View, Text, Button, StyleSheet, FlatList } from "react-native";
+import AsyncStorage from "@react-native-community/async-storage";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import ListItemRecorrido from '../../components/Recorrido/ListItemRecorrido';
-import SplashScreen from '../auth/SplashScreen';
+import ListItemRecorrido from "../../components/Recorrido/ListItemRecorrido";
+import SplashScreen from "../auth/SplashScreen";
 
-import { BASE_URL } from '../../config';
+import { BASE_URL } from "../../config";
 
 const RecorridoScreen = ({ navigation }) => {
   const [recorridos, setRecorridos] = useState([]);
@@ -17,7 +17,7 @@ const RecorridoScreen = ({ navigation }) => {
   }, []);
 
   const fetchRecorridos = async () => {
-    const Token = await AsyncStorage.getItem('userToken');
+    const Token = await AsyncStorage.getItem("userToken");
     const response = await fetch(`${BASE_URL}/api/recorrido`, {
       headers: {
         token: Token,
@@ -27,7 +27,6 @@ const RecorridoScreen = ({ navigation }) => {
     setRecorridos(data.recorridos);
     setRecorridosCargado(false);
   };
-
 
   return (
     <View style={styles.container}>
@@ -44,21 +43,21 @@ const RecorridoScreen = ({ navigation }) => {
                 item.estado_recorrido === true ? (
                   <Fragment>
                     <MaterialCommunityIcons
-                      name='circle'
+                      name="circle"
                       size={24}
-                      color='#6eeb85'
+                      color="#6eeb85"
                     />
-                    {'               '}
+                    {"               "}
                     <Text style={styles.text}>Tramo Operativo</Text>
                   </Fragment>
                 ) : (
                   <Fragment>
                     <MaterialCommunityIcons
-                      name='circle'
+                      name="circle"
                       size={24}
-                      color='#ff4747'
+                      color="#ff4747"
                     />
-                    {'               '}
+                    {"               "}
                     <Text style={styles.text}>Tramo No Operativo</Text>
                   </Fragment>
                 )
@@ -66,7 +65,7 @@ const RecorridoScreen = ({ navigation }) => {
               name={item.name_recorrido}
               name_poblacion={item.poblacion.name_poblacion}
               onPressDetails={() =>
-                navigation.navigate('Detalle', {
+                navigation.navigate("Detalle Recorrido", {
                   id: item._id,
                   name: item.name_recorrido,
                   name_poblacion: item.poblacion.name_poblacion,
@@ -76,7 +75,7 @@ const RecorridoScreen = ({ navigation }) => {
                 })
               }
               onPressComments={() =>
-                navigation.navigate('Comentarios', {
+                navigation.navigate("Comentarios", {
                   id: item._id,
                 })
               }
@@ -93,15 +92,15 @@ export default RecorridoScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#D5D3FB',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#D5D3FB",
   },
   list: {
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
   },
   text: {
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

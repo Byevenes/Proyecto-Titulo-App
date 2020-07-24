@@ -1,29 +1,27 @@
 import React, { useEffect, useState, Fragment } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import ListItemPuntoChofer from "../../components/Profile/PuntoChofer/ListItemPuntoChoferDetails";
 import SplashScreen from "../auth/SplashScreen";
 
 import { BASE_URL } from "../../config";
 
-const DetailsNotificationScreen = ({ route, navigation }) => {
-  const { idNotificacion } = route.params;
+const PuntosChoferDetailsProfileScreen = ({ route, navigation }) => {
+  const { idPuntoChofer, nombre, email } = route.params;
 
-  const [notificacionesDetails, setNotificacionesDetails] = useState([]);
-  const [
-    notificacionesDetailsCargada,
-    setNotificacionesDetailsCargada,
-  ] = useState(true);
+  const [puntoChofer, setPuntoChofer] = useState([]);
+  const [puntoChoferCargado, setPuntoChoferCargado] = useState(true);
 
   useEffect(() => {
-    fetchNotificacion();
+    fetchPuntoChofer();
   }, []);
 
-  const fetchNotificacion = async () => {
+  const fetchPuntoChofer = async () => {
     const Token = await AsyncStorage.getItem("userToken");
     const response = await fetch(
-      `${BASE_URL}/api/notificacion/${idNotificacion}`,
+      `${BASE_URL}/api/puntochofer/puntochoferid/${idPuntoChofer}`,
       {
         headers: {
           token: Token,
@@ -31,32 +29,24 @@ const DetailsNotificationScreen = ({ route, navigation }) => {
       }
     );
     const data = await response.json();
-    setNotificacionesDetails(data.notificacion);
-    setNotificacionesDetailsCargada(false);
+    setPuntoChofer(data.puntoChofer);
+    setPuntoChoferCargado(false);
   };
 
   return (
     <View style={styles.container}>
-      {notificacionesDetailsCargada ? (
+      {puntoChoferCargado ? (
         <SplashScreen />
       ) : (
         <Fragment>
-          <View style={styles.imageDetalleRecorrido}>
-            <Image
-              style={styles.imageDetalleRecorrido}
-              source={require("../../assets/imgRecorrido.png")}
-            />
-          </View>
           <View style={styles.viewName}>
-            <Text style={styles.textName}>
-              {notificacionesDetails.name_notificacion}
-            </Text>
-            <Text style={styles.textDescription}>
-              {notificacionesDetails.description_notificacion}
-            </Text>
-            <Text style={styles.textFecha}>
-              {notificacionesDetails.date_notificacion}
-            </Text>
+            <ListItemPuntoChofer
+              name={nombre}
+              email={email}
+              fecha={puntoChofer.date_chofer}
+              latitude={puntoChofer.location.coordinates.latitude}
+              longitude={puntoChofer.location.coordinates.longitude}
+            />
           </View>
           <View style={styles.button}>
             <TouchableOpacity
@@ -66,25 +56,29 @@ const DetailsNotificationScreen = ({ route, navigation }) => {
               <Text style={[styles.textbuttonGoBack]}>Volver Atras</Text>
             </TouchableOpacity>
           </View>
+          <View style={styles.button}>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Puntos Chofer", { idPuntoChofer })
+              }
+              style={[styles.buttonDelete]}
+            >
+              <Text style={[styles.textbuttonGoBack]}>Borrar Punto Chofer</Text>
+            </TouchableOpacity>
+          </View>
         </Fragment>
       )}
     </View>
   );
 };
 
-export default DetailsNotificationScreen;
+export default PuntosChoferDetailsProfileScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginHorizontal: 20,
-  },
-  imageDetalleRecorrido: {
-    width: 200,
-    height: 200,
-    paddingTop: 25,
   },
   viewName: {
     flex: 5,
@@ -96,11 +90,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     paddingBottom: 20,
   },
-  textDescription: {
-    fontSize: 14,
-    paddingBottom: 20,
-    textAlign: "left",
-  },
   textFecha: {
     fontSize: 13,
     color: "#626FB4",
@@ -108,7 +97,7 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    paddingBottom: 20,
+    paddingTop: 10,
   },
   buttonGoBack: {
     width: "100%",
@@ -120,12 +109,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 60,
   },
+  buttonDelete: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 50,
+    borderRadius: 30,
+    backgroundColor: "red",
+    borderWidth: 1,
+    paddingHorizontal: 60,
+  },
   textbuttonGoBack: {
     fontSize: 13,
     textAlign: "center",
     color: "white",
-  },
-  text: {
-    textAlign: "center",
   },
 });

@@ -13,6 +13,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   card: {
+    width: "80%",
     flex: 1,
     flexDirection: "row",
     margin: 5,
@@ -20,7 +21,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingTop: 20,
+    marginVertical: "25%",
   },
   textName: {
     fontSize: 18,
@@ -40,8 +41,12 @@ export default ({ name, email, fecha, latitude, longitude, onPress }) => {
         <Text style={styles.textName}>{name}</Text>
         <Text style={styles.textFecha}>{email}</Text>
         <Text style={styles.textFecha}>{JSON.stringify(fecha)}</Text>
-        <Text style={styles.textFecha}>{JSON.stringify(latitude)}</Text>
-        <Text style={styles.textFecha}>{JSON.stringify(longitude)}</Text>
+        <Text style={styles.textFecha}>{`Latitude: ${JSON.stringify(
+          latitude
+        )}`}</Text>
+        <Text style={styles.textFecha}>{`Longitude: ${JSON.stringify(
+          longitude
+        )}`}</Text>
       </Card>
     </TouchableOpacity>
   );

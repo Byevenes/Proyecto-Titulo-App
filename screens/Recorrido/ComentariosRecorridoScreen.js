@@ -1,37 +1,35 @@
-import React, { useState, useEffect, Fragment } from "react";
-import {
-  View,
-  Text,
-  Button,
-  StyleSheet,
-  FlatList,
-  Alert,
-  Modal,
-} from "react-native";
+import React, { useEffect, useState, Fragment } from "react";
+import { View, Text, Button, StyleSheet, FlatList, Alert } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import ListItemPuntoChofer from "../../components/Profile/PuntoChofer/ListItemPuntoChofer";
+import ListItemComentariosRecorrido from "../../components/Recorrido/ListItemComentariosRecorrido";
 import SplashScreen from "../auth/SplashScreen";
 
 import { BASE_URL } from "../../config";
 
-const PuntosChoferProfileScreen = ({ route, navigation }) => {
-  const { id, role } = route.params;
+const ComentariosRecorridoScreen = ({ route, navigation }) => {
+  const { id } = route.params;
 
-  const [puntoChofer, setPuntoChofer] = useState([]);
-  const [puntoChoferCargado, setPuntoChoferCargado] = useState(true);
+  const [comentariosRecorrido, setComentariosRecorrido] = useState([]);
+  const [
+    comentariosRecorridoCargado,
+    setComentariosRecorridoCargado,
+  ] = useState(true);
+
+  const [usuario, setUsuario] = useState("");
+  const [usuarioCargado, setUsuarioCargado] = useState(true);
 
   useEffect(() => {
-    if (route.params?.puntoChofer) {
+    if (route.params?.comment) {
       AsyncStorage.getItem("userToken").then((x) => {
-        fetch(`${BASE_URL}/api/puntochofer`, {
+        fetch(`${BASE_URL}/api/comentario`, {
           method: "POST",
           headers: {
             "Content-Type": "Application/json",
             token: x,
           },
-          body: JSON.stringify(route.params.puntoChofer),
+          body: JSON.stringify(route.params.comment),
         })
           .then((x) => x.text())
           .then((x) => {
@@ -43,20 +41,22 @@ const PuntosChoferProfileScreen = ({ route, navigation }) => {
           })
           .then((x) => {
             if (x.ok === true) {
-              return Alert.alert("Punto de Chofer Añadido");
+              return Alert.alert("Comentario Añadido");
             }
-            return Alert.alert("No se pudo Añadir el Punto");
+            return Alert.alert("No se pudo Añadir el Comentario");
           });
       });
     }
-    role === "CHOFER_ROLE" ? fetchPuntoChofer() : fetchPuntoChoferes();
-  }, [route.params?.puntoChofer]);
+
+    fetchComentariosRecorrido();
+    fetchIdUser();
+  }, [route.params?.comment]);
 
   useEffect(() => {
-    if (route.params?.idPuntoChofer) {
+    if (route.params?.idComentario) {
       Alert.alert(
         "Esta seguro ",
-        "que desea eliminar este punto de chofer",
+        "que desea eliminar este comentario",
         [
           {
             text: "Cancelar",
@@ -67,7 +67,7 @@ const PuntosChoferProfileScreen = ({ route, navigation }) => {
             onPress: () => {
               AsyncStorage.getItem("userToken").then((x) => {
                 fetch(
-                  `${BASE_URL}/api/puntochofer/${route.params.idPuntoChofer}`,
+                  `${BASE_URL}/api/comentario/${route.params.idComentario}`,
                   {
                     method: "DELETE",
                     headers: {
@@ -86,11 +86,10 @@ const PuntosChoferProfileScreen = ({ route, navigation }) => {
                   })
                   .then((x) => {
                     if (x.ok === false) {
-                      alert("No se pudo eliminar el punto de chofer");
+                      alert("No se pudo eliminar el comentario");
                     }
-                    role === "CHOFER_ROLE"
-                      ? fetchPuntoChofer()
-                      : fetchPuntoChoferes();
+                    fetchComentariosRecorrido();
+                    fetchIdUser();
                     return Alert.alert(x.message);
                   });
               });
@@ -100,52 +99,49 @@ const PuntosChoferProfileScreen = ({ route, navigation }) => {
         { cancelable: false }
       );
     }
-  }, [route.params?.idPuntoChofer]);
+  }, [route.params?.idComentario]);
 
-  const fetchPuntoChoferes = async () => {
-    const Token = await AsyncStorage.getItem("userToken");
-    const response = await fetch(`${BASE_URL}/api/puntochofer`, {
-      headers: {
-        token: Token,
-      },
-    });
-    const data = await response.json();
-    setPuntoChofer(data.puntoChoferes);
-    setPuntoChoferCargado(false);
+  const fetchIdUser = async () => {
+    const idUser = await AsyncStorage.getItem("userID");
+    setUsuario(idUser);
+    setUsuarioCargado(false);
   };
 
-  const fetchPuntoChofer = async () => {
+  const fetchComentariosRecorrido = async () => {
     const Token = await AsyncStorage.getItem("userToken");
-    const response = await fetch(`${BASE_URL}/api/puntochofer/${id}`, {
-      headers: {
-        token: Token,
-      },
-    });
+    const response = await fetch(
+      `${BASE_URL}/api/comentario/comentariorecorridoid/${id}`,
+      {
+        headers: {
+          token: Token,
+        },
+      }
+    );
     const data = await response.json();
-    setPuntoChofer(data.puntoChofer);
-    setPuntoChoferCargado(false);
+    setComentariosRecorrido(data.comentario);
+    setComentariosRecorridoCargado(false);
   };
 
   return (
     <View style={styles.container}>
-      {puntoChoferCargado ? (
+      {comentariosRecorridoCargado || usuarioCargado ? (
         <SplashScreen />
       ) : (
         <Fragment>
           <FlatList
             style={styles.list}
-            data={puntoChofer}
+            data={comentariosRecorrido}
             keyExtractor={(x) => x._id}
             renderItem={({ item }) => (
-              <ListItemPuntoChofer
-                name={item.chofer.nombre}
-                email={item.chofer.email}
-                fecha={item.date_chofer}
+              <ListItemComentariosRecorrido
+                name={item.description_comentario}
+                name_user={item.creator.nombre}
+                fecha={item.date_comentario}
                 onPress={() =>
-                  navigation.navigate("Detalle Punto Chofer", {
-                    idPuntoChofer: item._id,
-                    nombre: item.chofer.nombre,
-                    email: item.chofer.email,
+                  navigation.navigate("Detalle Comentario", {
+                    idComentario: item._id,
+                    idCreator: item.creator._id,
+                    idUser: usuario,
                   })
                 }
               />
@@ -153,12 +149,13 @@ const PuntosChoferProfileScreen = ({ route, navigation }) => {
           />
           <View style={styles.button}>
             <MaterialCommunityIcons
-              name="plus-circle-outline"
+              name="comment-plus-outline"
               size={40}
               color="black"
               onPress={() =>
-                navigation.navigate("Crear Punto", {
-                  idChofer: id,
+                navigation.navigate("Crear Comentario", {
+                  idRecorrido: id,
+                  idUser: usuario,
                 })
               }
             />
@@ -169,14 +166,12 @@ const PuntosChoferProfileScreen = ({ route, navigation }) => {
   );
 };
 
-export default PuntosChoferProfileScreen;
+export default ComentariosRecorridoScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
   },
   list: {
     alignSelf: "stretch",

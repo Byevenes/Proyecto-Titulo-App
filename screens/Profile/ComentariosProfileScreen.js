@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, FlatList } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
+import React, { useEffect, useState } from "react";
+import { View, Text, Button, StyleSheet, FlatList } from "react-native";
+import AsyncStorage from "@react-native-community/async-storage";
 
-import ListItemComentario from '../../components/Profile/Comentario/ListItemComentario';
-import SplashScreen from '../auth/SplashScreen';
+import ListItemComentario from "../../components/Profile/Comentario/ListItemComentario";
+import SplashScreen from "../auth/SplashScreen";
 
-import { BASE_URL } from '../../config';
+import { BASE_URL } from "../../config";
 
 const ComentarioProfileScreen = ({ route, navigation }) => {
   const { id } = route.params;
@@ -18,7 +18,7 @@ const ComentarioProfileScreen = ({ route, navigation }) => {
   }, []);
 
   const fetchComentario = async () => {
-    const Token = await AsyncStorage.getItem('userToken');
+    const Token = await AsyncStorage.getItem("userToken");
     const response = await fetch(`${BASE_URL}/api/comentario/${id}`, {
       headers: {
         token: Token,
@@ -42,6 +42,11 @@ const ComentarioProfileScreen = ({ route, navigation }) => {
             <ListItemComentario
               name={item.description_comentario}
               fecha={item.date_comentario}
+              onPress={() =>
+                navigation.navigate("Detalle Comentario", {
+                  idComentario: item._id,
+                })
+              }
             />
           )}
         />
@@ -55,11 +60,11 @@ export default ComentarioProfileScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
   list: {
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
   },
 });

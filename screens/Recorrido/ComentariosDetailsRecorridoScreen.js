@@ -1,29 +1,38 @@
 import React, { useEffect, useState, Fragment } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import SplashScreen from "../auth/SplashScreen";
 
 import { BASE_URL } from "../../config";
 
-const DetailsNotificationScreen = ({ route, navigation }) => {
-  const { idNotificacion } = route.params;
+const ComentariosDetailsRecorridoScreen = ({ route, navigation }) => {
+  const { idComentario, idCreator, idUser } = route.params;
 
-  const [notificacionesDetails, setNotificacionesDetails] = useState([]);
   const [
-    notificacionesDetailsCargada,
-    setNotificacionesDetailsCargada,
+    comentariosDetailsRecorrido,
+    setComentariosDetailsRecorrido,
+  ] = useState([]);
+  const [
+    comentariosDetailsRecorridoCargado,
+    setComentariosDetailsRecorridoCargado,
   ] = useState(true);
 
   useEffect(() => {
-    fetchNotificacion();
+    fetchComentariosRecorrido();
   }, []);
 
-  const fetchNotificacion = async () => {
+  const fetchComentariosRecorrido = async () => {
     const Token = await AsyncStorage.getItem("userToken");
     const response = await fetch(
-      `${BASE_URL}/api/notificacion/${idNotificacion}`,
+      `${BASE_URL}/api/comentario/comentarioid/${idComentario}`,
       {
         headers: {
           token: Token,
@@ -31,31 +40,28 @@ const DetailsNotificationScreen = ({ route, navigation }) => {
       }
     );
     const data = await response.json();
-    setNotificacionesDetails(data.notificacion);
-    setNotificacionesDetailsCargada(false);
+    setComentariosDetailsRecorrido(data.comentario);
+    setComentariosDetailsRecorridoCargado(false);
   };
 
   return (
     <View style={styles.container}>
-      {notificacionesDetailsCargada ? (
+      {comentariosDetailsRecorridoCargado ? (
         <SplashScreen />
       ) : (
         <Fragment>
-          <View style={styles.imageDetalleRecorrido}>
+          <View style={styles.imageComentario}>
             <Image
-              style={styles.imageDetalleRecorrido}
-              source={require("../../assets/imgRecorrido.png")}
+              style={styles.imageComentario}
+              source={require("../../assets/imgComentarioRecorrido.png")}
             />
           </View>
           <View style={styles.viewName}>
             <Text style={styles.textName}>
-              {notificacionesDetails.name_notificacion}
-            </Text>
-            <Text style={styles.textDescription}>
-              {notificacionesDetails.description_notificacion}
+              {comentariosDetailsRecorrido.description_comentario}
             </Text>
             <Text style={styles.textFecha}>
-              {notificacionesDetails.date_notificacion}
+              {comentariosDetailsRecorrido.date_comentario}
             </Text>
           </View>
           <View style={styles.button}>
@@ -66,25 +72,42 @@ const DetailsNotificationScreen = ({ route, navigation }) => {
               <Text style={[styles.textbuttonGoBack]}>Volver Atras</Text>
             </TouchableOpacity>
           </View>
+          {idUser === idCreator ? (
+            <Fragment>
+              <View style={styles.button}>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate("Comentarios", { idComentario })
+                  }
+                  style={[styles.buttonDelete]}
+                >
+                  <Text style={[styles.textbuttonGoBack]}>
+                    Borrar Comentario
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </Fragment>
+          ) : (
+            <Fragment></Fragment>
+          )}
         </Fragment>
       )}
     </View>
   );
 };
 
-export default DetailsNotificationScreen;
+export default ComentariosDetailsRecorridoScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginHorizontal: 20,
   },
-  imageDetalleRecorrido: {
+  imageComentario: {
     width: 200,
     height: 200,
-    paddingTop: 25,
+    paddingTop: 50,
   },
   viewName: {
     flex: 5,
@@ -95,11 +118,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     paddingBottom: 20,
-  },
-  textDescription: {
-    fontSize: 14,
-    paddingBottom: 20,
-    textAlign: "left",
   },
   textFecha: {
     fontSize: 13,
@@ -120,12 +138,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 60,
   },
+  buttonDelete: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 50,
+    borderRadius: 30,
+    backgroundColor: "red",
+    borderWidth: 1,
+    paddingHorizontal: 60,
+  },
   textbuttonGoBack: {
     fontSize: 13,
     textAlign: "center",
     color: "white",
-  },
-  text: {
-    textAlign: "center",
   },
 });

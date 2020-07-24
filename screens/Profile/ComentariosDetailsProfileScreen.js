@@ -1,29 +1,30 @@
 import React, { useEffect, useState, Fragment } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import SplashScreen from "../auth/SplashScreen";
 
 import { BASE_URL } from "../../config";
 
-const DetailsNotificationScreen = ({ route, navigation }) => {
-  const { idNotificacion } = route.params;
+const ComentariosDetailsProfileScreen = ({ route, navigation }) => {
+  const { idComentario } = route.params;
 
-  const [notificacionesDetails, setNotificacionesDetails] = useState([]);
+  const [comentariosDetailsProfile, setcomentariosDetailsProfile] = useState(
+    []
+  );
   const [
-    notificacionesDetailsCargada,
-    setNotificacionesDetailsCargada,
+    comentariosDetailsProfileCargado,
+    setcomentariosDetailsProfileCargado,
   ] = useState(true);
 
   useEffect(() => {
-    fetchNotificacion();
+    fetchComentariosProfile();
   }, []);
 
-  const fetchNotificacion = async () => {
+  const fetchComentariosProfile = async () => {
     const Token = await AsyncStorage.getItem("userToken");
     const response = await fetch(
-      `${BASE_URL}/api/notificacion/${idNotificacion}`,
+      `${BASE_URL}/api/comentario/comentarioid/${idComentario}`,
       {
         headers: {
           token: Token,
@@ -31,31 +32,28 @@ const DetailsNotificationScreen = ({ route, navigation }) => {
       }
     );
     const data = await response.json();
-    setNotificacionesDetails(data.notificacion);
-    setNotificacionesDetailsCargada(false);
+    setcomentariosDetailsProfile(data.comentario);
+    setcomentariosDetailsProfileCargado(false);
   };
 
   return (
     <View style={styles.container}>
-      {notificacionesDetailsCargada ? (
+      {comentariosDetailsProfileCargado ? (
         <SplashScreen />
       ) : (
         <Fragment>
-          <View style={styles.imageDetalleRecorrido}>
+          <View style={styles.imageComentario}>
             <Image
-              style={styles.imageDetalleRecorrido}
-              source={require("../../assets/imgRecorrido.png")}
+              style={styles.imageComentario}
+              source={require("../../assets/imgComentarioRecorrido.png")}
             />
           </View>
           <View style={styles.viewName}>
             <Text style={styles.textName}>
-              {notificacionesDetails.name_notificacion}
-            </Text>
-            <Text style={styles.textDescription}>
-              {notificacionesDetails.description_notificacion}
+              {comentariosDetailsProfile.description_comentario}
             </Text>
             <Text style={styles.textFecha}>
-              {notificacionesDetails.date_notificacion}
+              {comentariosDetailsProfile.date_comentario}
             </Text>
           </View>
           <View style={styles.button}>
@@ -72,19 +70,18 @@ const DetailsNotificationScreen = ({ route, navigation }) => {
   );
 };
 
-export default DetailsNotificationScreen;
+export default ComentariosDetailsProfileScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginHorizontal: 20,
   },
-  imageDetalleRecorrido: {
+  imageComentario: {
     width: 200,
     height: 200,
-    paddingTop: 25,
+    paddingTop: 50,
   },
   viewName: {
     flex: 5,
@@ -95,11 +92,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     paddingBottom: 20,
-  },
-  textDescription: {
-    fontSize: 14,
-    paddingBottom: 20,
-    textAlign: "left",
   },
   textFecha: {
     fontSize: 13,
@@ -124,8 +116,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textAlign: "center",
     color: "white",
-  },
-  text: {
-    textAlign: "center",
   },
 });
